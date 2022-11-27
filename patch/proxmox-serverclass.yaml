@@ -1,0 +1,12 @@
+apiVersion: metal.sidero.dev/v1alpha1
+kind: ServerClass
+metadata:
+  name: proxmox-vm
+spec:
+  configPatches:
+  - op: replace
+    path: /machine/install/disk
+    value: /dev/sda
+  qualifiers:
+    cpu:
+    - manufacturer: QEMU
