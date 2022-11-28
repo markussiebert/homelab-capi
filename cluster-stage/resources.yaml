@@ -1,0 +1,130 @@
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: Cluster
+metadata:
+  name: cluster-stage
+  namespace: default
+spec:
+  clusterNetwork:
+    pods:
+      cidrBlocks:
+      - 10.244.0.0/16
+    services:
+      cidrBlocks:
+      - 10.96.0.0/12
+  controlPlaneRef:
+    apiVersion: controlplane.cluster.x-k8s.io/v1alpha3
+    kind: TalosControlPlane
+    name: cluster-stage-cp
+  infrastructureRef:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
+    kind: MetalCluster
+    name: cluster-stage
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
+kind: MetalCluster
+metadata:
+  name: cluster-stage
+  namespace: default
+spec:
+  controlPlaneEndpoint:
+    host: 192.168.100.120
+    port: 6443
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
+kind: MetalMachineTemplate
+metadata:
+  name: cluster-stage-cp
+  namespace: default
+spec:
+  template:
+    spec:
+      serverClassRef:
+        apiVersion: metal.sidero.dev/v1alpha1
+        kind: ServerClass
+        name: proxmox-vm
+---
+apiVersion: controlplane.cluster.x-k8s.io/v1alpha3
+kind: TalosControlPlane
+metadata:
+  name: cluster-stage-cp
+  namespace: default
+spec:
+  controlPlaneConfig:
+    controlplane:
+      configPatches:
+      - op: add
+        path: /machine/network
+        value:
+          interfaces:
+          - interface: eth0
+            dhcp: true
+            vip:
+              ip: 192.168.100.120
+      generateType: controlplane
+      talosVersion: v0.14.0
+    init:
+      configPatches:
+      - op: add
+        path: /machine/network
+        value:
+          interfaces:
+          - interface: eth0
+            dhcp: true
+            vip:
+              ip: 172.16.200.52
+      generateType: init
+      talosVersion: v0.14.0
+  infrastructureTemplate:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
+    kind: MetalMachineTemplate
+    name: cluster-stage-cp
+  replicas: 3
+  version: v1.22.2
+---
+apiVersion: bootstrap.cluster.x-k8s.io/v1alpha3
+kind: TalosConfigTemplate
+metadata:
+  name: cluster-stage-workers
+  namespace: default
+spec:
+  template:
+    spec:
+      generateType: join
+      talosVersion: v0.14.0
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachineDeployment
+metadata:
+  name: cluster-stage-workers
+  namespace: default
+spec:
+  clusterName: cluster-stage
+  replicas: 0
+  selector:
+    matchLabels: null
+  template:
+    spec:
+      bootstrap:
+        configRef:
+          apiVersion: bootstrap.cluster.x-k8s.io/v1alpha3
+          kind: TalosConfigTemplate
+          name: cluster-stage-workers
+      clusterName: cluster-stage
+      infrastructureRef:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
+        kind: MetalMachineTemplate
+        name: cluster-stage-workers
+      version: v1.22.2
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
+kind: MetalMachineTemplate
+metadata:
+  name: cluster-stage-workers
+  namespace: default
+spec:
+  template:
+    spec:
+      serverClassRef:
+        apiVersion: metal.sidero.dev/v1alpha1
+        kind: ServerClass
+        name: proxmox-vm
