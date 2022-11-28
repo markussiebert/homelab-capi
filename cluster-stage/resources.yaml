@@ -79,7 +79,7 @@ spec:
     kind: MetalMachineTemplate
     name: cluster-stage-cp
   replicas: 3
-  version: v1.22.2
+  version: v1.25.4
 ---
 apiVersion: bootstrap.cluster.x-k8s.io/v1alpha3
 kind: TalosConfigTemplate
@@ -114,7 +114,7 @@ spec:
         apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
         kind: MetalMachineTemplate
         name: cluster-stage-workers
-      version: v1.22.2
+      version: v1.25.4
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
 kind: MetalMachineTemplate
