@@ -61,7 +61,7 @@ spec:
             vip:
               ip: 192.168.100.120
       generateType: controlplane
-      talosVersion: v0.14.0
+      talosVersion: v.1.2.7
     init:
       configPatches:
       - op: add
@@ -73,7 +73,7 @@ spec:
             vip:
               ip: 172.16.200.52
       generateType: init
-      talosVersion: v0.14.0
+      talosVersion: v.1.2.7
   infrastructureTemplate:
     apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
     kind: MetalMachineTemplate
@@ -90,7 +90,7 @@ spec:
   template:
     spec:
       generateType: join
-      talosVersion: v0.14.0
+      talosVersion: v.1.2.7
 ---
 apiVersion: cluster.x-k8s.io/v1beta1
 kind: MachineDeployment
