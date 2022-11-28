@@ -71,7 +71,7 @@ spec:
           - interface: eth0
             dhcp: true
             vip:
-              ip: 172.16.200.52
+              ip: 192.168.100.120
       generateType: init
       talosVersion: v0.14.0
   infrastructureTemplate:
